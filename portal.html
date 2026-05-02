@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>סטודיו FRAME — פורטל מיוצגים</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #f5c842; --gold2: #e8a020;
+    --dark: #0a0a0f; --dark2: #12121a; --dark3: #1c1c2a; --dark4: #252535;
+    --text: #f0ead6; --text2: #8a8070;
+    --green: #2ecc71; --red: #e74c3c; --blue: #3b82f6;
+    --border: rgba(245,200,66,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Heebo', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; direction: rtl; }
+  .page { max-width: 640px; margin: 0 auto; padding: 20px 16px 60px; }
+  header { text-align: center; padding: 28px 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .logo { font-size: 26px; font-weight: 900; color: var(--gold); letter-spacing: 2px; }
+  .logo-sub { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .card { background: var(--dark3); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 18px; }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  input, textarea, select { background: var(--dark4); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'Heebo', sans-serif; font-size: 15px; width: 100%; outline: none; transition: border-color 0.2s; direction: rtl; }
+  input:focus, textarea:focus { border-color: rgba(245,200,66,0.5); }
+  input::placeholder, textarea::placeholder { color: var(--text2); }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  label { font-size: 13px; color: var(--gold); font-weight: 700; margin-bottom: 6px; display: block; }
+  .field { margin-bottom: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hint { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .required { color: var(--red); }
+  .section-label { font-size: 12px; font-weight: 700; color: var(--text2); margin: 16px 0 10px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px; }
+  .btn { padding: 13px 24px; border-radius: 12px; border: none; cursor: pointer; font-family: 'Heebo', sans-serif; font-weight: 700; font-size: 15px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+  .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #1a1000; width: 100%; }
+  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,200,66,0.3); }
+  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-ghost { background: rgba(255,255,255,0.06); color: var(--text2); border: 1px solid rgba(255,255,255,0.1); }
+  .btn-green { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+  .steps { display: flex; margin-bottom: 24px; }
+  .step { flex: 1; text-align: center; padding: 10px 4px; font-size: 11px; font-weight: 700; color: var(--text2); border-bottom: 3px solid rgba(255,255,255,0.06); transition: all 0.2s; }
+  .step.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .step.done { color: var(--green); border-bottom-color: var(--green); }
+  .auth-screen { max-width: 380px; margin: 50px auto; padding: 0 16px; text-align: center; }
+  .auth-card { background: var(--dark3); border: 1px solid var(--border); border-radius: 20px; padding: 30px 26px; }
+  .auth-icon { font-size: 48px; margin-bottom: 12px; }
+  .auth-title { font-size: 22px; font-weight: 900; color: var(--gold); margin-bottom: 4px; }
+  .auth-sub { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
+  .auth-toggle { font-size: 13px; color: var(--text2); margin-top: 14px; }
+  .auth-toggle span { color: var(--gold); cursor: pointer; text-decoration: underline; }
+  .error-msg { background: rgba(231,76,60,0.12); color: #e74c3c; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px; display: none; }
+  /* Photos */
+  .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .photo-slot { aspect-ratio: 3/4; border: 2px dashed rgba(245,200,66,0.25); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: rgba(245,200,66,0.03); overflow: hidden; position: relative; }
+  .photo-slot:hover { border-color: rgba(245,200,66,0.5); }
+  .photo-slot.has-image { border-style: solid; border-color: rgba(245,200,66,0.4); }
+  .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-slot input[type=file] { display: none; }
+  .remove-photo { position: absolute; top: 5px; left: 5px; background: rgba(231,76,60,0.85); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: none; align-items: center; justify-content: center; }
+  .photo-slot:hover .remove-photo { display: flex; }
+  /* Terms */
+  .terms-box { background: var(--dark4); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px; max-height: 260px; overflow-y: auto; font-size: 13px; line-height: 1.85; color: rgba(240,234,214,0.8); margin-bottom: 16px; }
+  .terms-box h4 { color: var(--gold); font-size: 13px; font-weight: 700; margin: 12px 0 6px; }
+  .terms-box p { margin-bottom: 8px; }
+  .terms-box ul { margin: 6px 0 10px 0; padding-right: 18px; }
+  .terms-box ul li { margin-bottom: 4px; }
+  .checkbox-row { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin-bottom: 12px; }
+  .checkbox-row input[type=checkbox] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--gold); flex-shrink: 0; }
+  /* Profile page */
+  .profile-tabs { display: flex; background: var(--dark2); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 20px; }
+  .profile-tab { flex: 1; text-align: center; padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 700; color: var(--text2); cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: 'Heebo', sans-serif; }
+  .profile-tab.active { background: var(--dark3); color: var(--gold); }
+  .status-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 20px; padding: 5px 14px; font-size: 13px; font-weight: 700; }
+  .status-pending { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+  .status-approved { background: rgba(46,204,113,0.12); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+  .status-rejected { background: rgba(231,76,60,0.12); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+  .audit-item { background: var(--dark4); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .audit-project { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .audit-meta { font-size: 13px; color: var(--text2); }
+  .audit-status { display: inline-block; border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 700; margin-top: 6px; }
+  .as-waiting { background: rgba(245,200,66,0.12); color: var(--gold); }
+  .as-callback { background: rgba(168,85,247,0.12); color: #c084fc; }
+  .as-got_role { background: rgba(46,204,113,0.15); color: var(--green); }
+  .as-rejected { background: rgba(231,76,60,0.1); color: var(--red); }
+  .as-sent { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .loading { text-align: center; padding: 50px; color: var(--text2); }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: var(--dark4); border-radius: 3px; }
+  @media (max-width: 480px) { .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div id="loadingScreen" class="loading">⏳ טוען...</div>
+<div id="authScreen" style="display:none"></div>
+<div id="appScreen" style="display:none"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAM33VicGChnAmJvAw_-t-sb33VtPh_rhA",
+  authDomain: "staragent-prime.firebaseapp.com",
+  projectId: "staragent-prime",
+  storageBucket: "staragent-prime.firebasestorage.app",
+  messagingSenderId: "899836b8982",
+  appId: "1:899836b8982:web:7654d8bbabf318719ebb77"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let userData = null;
+let photoFiles = [null, null, null];
+let links = [''];
+let currentStep = 1;
+let activeProfileTab = 'profile';
+
+// ===== AUTH STATE =====
+onAuthStateChanged(auth, async (user) => {
+  document.getElementById('loadingScreen').style.display = 'none';
+  if (user) {
+    currentUser = user;
+    const snap = await getDoc(doc(db, 'registrations', user.uid));
+    userData = snap.exists() ? snap.data() : null;
+    showApp();
+  } else {
+    showAuth('login');
+  }
+});
+
+// ===== AUTH =====
+function showAuth(mode) {
+  document.getElementById('authScreen').style.display = '';
+  document.getElementById('appScreen').style.display = 'none';
+  const s = document.getElementById('authScreen');
+  if (mode === 'login') {
+    s.innerHTML = `<div class="auth-screen">
+      <header><div class="logo">F R A M E</div><div class="logo-sub">פורטל מיוצגים</div></header>
+      <div class="auth-card">
+        <div class="auth-icon">🎬</div>
+        <div class="auth-title">כניסה</div>
+        <div class="auth-sub">כנס עם כתובת המייל שלך</div>
+        <div class="error-msg" id="authErr"></div>
+        <div class="field"><label>מייל</label><input type="email" id="aEmail" placeholder="your@email.com" style="direction:ltr;text-align:left"></div>
+        <div class="field"><label>סיסמא</label><input type="password" id="aPass" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn btn-gold" onclick="doLogin()">כניסה →</button>
+        <div class="auth-toggle">עדיין לא נרשמת? <span onclick="showAuthReg()">הרשם כאן</span></div>
+      </div></div>`;
+  } else {
+    s.innerHTML = `<div class="auth-screen">
+      <header><div class="logo">F R A M E</div><div class="logo-sub">פורטל מיוצגים</div></header>
+      <div class="auth-card">
+        <div class="auth-icon">✨</div>
+        <div class="auth-title">הרשמה</div>
+        <div class="auth-sub">צור חשבון חדש</div>
+        <div class="error-msg" id="authErr"></div>
+        <div class="field"><label>מייל</label><input type="email" id="aEmail" placeholder="your@email.com" style="direction:ltr;text-align:left"></div>
+        <div class="field"><label>סיסמא (לפחות 6 תווים)</label><input type="password" id="aPass" placeholder="••••••"></div>
+        <div class="field"><label>אימות סיסמא</label><input type="password" id="aPass2" placeholder="••••••" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <button class="btn btn-gold" onclick="doRegister()">הרשמה →</button>
+        <div class="auth-toggle">כבר יש לך חשבון? <span onclick="showAuthLogin()">כניסה</span></div>
+      </div></div>`;
+  }
+}
+window.showAuthReg = () => showAuth('register');
+window.showAuthLogin = () => showAuth('login');
+
+window.doLogin = async () => {
+  const e = document.getElementById('aEmail').value.trim();
+  const p = document.getElementById('aPass').value;
+  const err = document.getElementById('authErr');
+  err.style.display = 'none';
+  try { await signInWithEmailAndPassword(auth, e, p); }
+  catch { err.textContent = 'מייל או סיסמא שגויים'; err.style.display = 'block'; }
+};
+
+window.doRegister = async () => {
+  const e = document.getElementById('aEmail').value.trim();
+  const p = document.getElementById('aPass').value;
+  const p2 = document.getElementById('aPass2').value;
+  const err = document.getElementById('authErr');
+  err.style.display = 'none';
+  if (p !== p2) { err.textContent = 'הסיסמאות לא תואמות'; err.style.display = 'block'; return; }
+  if (p.length < 6) { err.textContent = 'הסיסמא חייבת להיות לפחות 6 תווים'; err.style.display = 'block'; return; }
+  try { await createUserWithEmailAndPassword(auth, e, p); }
+  catch(ex) {
+    err.textContent = ex.code === 'auth/email-already-in-use' ? 'מייל זה כבר רשום' : 'שגיאה, נסה שוב';
+    err.style.display = 'block';
+  }
+};
+
+// ===== APP =====
+function showApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = '';
+  if (!userData) { currentStep = 1; renderStep(); }
+  else if (userData.status === 'approved') showProfile();
+  else showStatusWaiting();
+}
+
+// ===== REGISTRATION FLOW =====
+function renderStep() {
+  const s = document.getElementById('appScreen');
+  s.innerHTML = `<header><div class="logo">F R A M E</div><div class="logo-sub">טופס הרשמת מיוצג</div></header>
+  <div class="page">
+    <div class="steps">
+      <div class="step ${currentStep>=1?(currentStep>1?'done':'active'):''}">📋 פרטים</div>
+      <div class="step ${currentStep>=2?(currentStep>2?'done':'active'):''}">📸 תמונות</div>
+      <div class="step ${currentStep>=3?(currentStep>3?'done':'active'):''}">🔗 קישורים</div>
+      <div class="step ${currentStep>=4?'active':''}">✍️ הסכם</div>
+    </div>
+    <div id="stepContent"></div>
+  </div>`;
+  if (currentStep === 1) renderStep1();
+  else if (currentStep === 2) renderStep2();
+  else if (currentStep === 3) renderStep3();
+  else renderStep4();
+}
+
+// STEP 1 - Details
+function renderStep1() {
+  const d = window._fd || {};
+  document.getElementById('stepContent').innerHTML = `
+    <div class="card">
+      <div class="card-title">📋 פרטים אישיים</div>
+      <div class="section-label">פרטי המיוצג</div>
+      <div class="grid2">
+        <div class="field"><label>שם פרטי <span class="required">*</span></label><input id="f1" placeholder="נועם" value="${d.firstName||''}"></div>
+        <div class="field"><label>שם משפחה <span class="required">*</span></label><input id="f2" placeholder="ישראלי" value="${d.lastName||''}"></div>
+        <div class="field"><label>תאריך לידה <span class="required">*</span></label><input type="date" id="f3" value="${d.birthday||''}"></div>
+        <div class="field"><label>מספר זהות (ת.ז)</label><input id="f4" placeholder="000000000" value="${d.idNumber||''}"></div>
+        <div class="field"><label>טלפון מיוצג</label><input type="tel" id="f5" placeholder="050-0000000" value="${d.phone||''}"></div>
+        <div class="field"><label>מייל מיוצג</label><input type="email" id="f6" placeholder="noam@gmail.com" value="${d.email||currentUser?.email||''}"></div>
+      </div>
+      <div class="section-label">פרטי הורה / אפוטרופוס</div>
+      <div class="grid2">
+        <div class="field"><label>שם הורה <span class="required">*</span></label><input id="f7" placeholder="דינה ישראלי" value="${d.parentName||''}"></div>
+        <div class="field"><label>טלפון הורה <span class="required">*</span></label><input type="tel" id="f8" placeholder="050-1111111" value="${d.parentPhone||''}"></div>
+        <div class="field"><label>מייל הורה</label><input type="email" id="f9" placeholder="dina@gmail.com" value="${d.parentEmail||''}"></div>
+      </div>
+      <div class="field">
+        <label>ניסיון / כישורים מיוחדים</label>
+        <textarea id="f10" placeholder="ספר לנו על הניסיון שלך, שפות, ריקוד, שירה...">${d.notes||''}</textarea>
+      </div>
+    </div>
+    <button class="btn btn-gold" onclick="saveStep1()">הבא ← תמונות</button>`;
+}
+window.saveStep1 = () => {
+  const v = (id) => document.getElementById(id)?.value.trim()||'';
+  if (!v('f1')||!v('f2')||!v('f3')||!v('f7')||!v('f8')) { alert('נא למלא את כל שדות החובה (*)'); return; }
+  window._fd = { ...window._fd, firstName:v('f1'), lastName:v('f2'), birthday:v('f3'), idNumber:v('f4'), phone:v('f5'), email:v('f6'), parentName:v('f7'), parentPhone:v('f8'), parentEmail:v('f9'), notes:v('f10') };
+  currentStep=2; renderStep();
+};
+
+// STEP 2 - Photos
+function renderStep2() {
+  document.getElementById('stepContent').innerHTML = `
+    <div class="card">
+      <div class="card-title">📸 תמונות לבוק שחקן</div>
+      <p class="hint" style="margin-bottom:14px">העלה עד 3 תמונות: פנים / פלג גוף עליון בלבד, רקע נייטרלי, איכות גבוהה, צבע</p>
+      <div class="photos-grid">
+        ${[0,1,2].map(i=>`
+          <div class="photo-slot ${photoFiles[i]?'has-image':''}" id="slot${i}" onclick="document.getElementById('pi${i}').click()">
+            <input type="file" id="pi${i}" accept="image/*" onchange="handlePhoto(${i},this)">
+            ${photoFiles[i]
+              ? `<img src="${URL.createObjectURL(photoFiles[i])}"><button class="remove-photo" onclick="event.stopPropagation();removePhoto(${i})">✕</button>`
+              : `<div style="font-size:26px;margin-bottom:6px">📷</div><div style="font-size:12px;color:var(--text2)">תמונה ${i+1}</div>`}
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" onclick="goBack()" style="flex:0.4">← חזור</button>
+      <button class="btn btn-gold" onclick="goStep3()" style="flex:1">הבא ← קישורים</button>
+    </div>`;
+}
+window.handlePhoto = (i,inp) => { if(!inp.files[0])return; photoFiles[i]=inp.files[0]; renderStep(); };
+window.removePhoto = (i) => { photoFiles[i]=null; renderStep(); };
+window.goStep3 = () => { currentStep=3; renderStep(); };
+
+// STEP 3 - Links
+function renderStep3() {
+  document.getElementById('stepContent').innerHTML = `
+    <div class="card">
+      <div class="card-title">🔗 קישורים לעבודות ופלייליסט</div>
+      <p class="hint" style="margin-bottom:14px">הוסף קישורי YouTube לפרסומות, סדרות, פלייליסט ניסיון — מומלץ לרכז הכל בפלייליסט אחד</p>
+      <div id="linksWrap">
+        ${links.map((l,i)=>`
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input type="url" value="${l}" placeholder="https://youtube.com/..." style="direction:ltr;text-align:left" oninput="links[${i}]=this.value">
+            ${links.length>1?`<button style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.2);color:#e74c3c;border-radius:8px;padding:8px 12px;cursor:pointer" onclick="removeLink(${i})">✕</button>`:''}
+          </div>`).join('')}
+      </div>
+      <button style="background:rgba(245,200,66,0.1);border:1px dashed rgba(245,200,66,0.3);border-radius:10px;padding:10px;color:var(--gold);font-size:13px;cursor:pointer;width:100%;font-family:Heebo,sans-serif;font-weight:600" onclick="addLink()">+ הוסף קישור נוסף</button>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" onclick="goBack()" style="flex:0.4">← חזור</button>
+      <button class="btn btn-gold" onclick="goStep4()" style="flex:1">הבא ← הסכם ייצוג</button>
+    </div>`;
+}
+window.addLink = () => { links.push(''); renderStep(); };
+window.removeLink = (i) => { links.splice(i,1); if(!links.length)links=['']; renderStep(); };
+window.goStep4 = () => {
+  document.querySelectorAll('#linksWrap input').forEach((inp,i)=>{ if(links[i]!==undefined)links[i]=inp.value.trim(); });
+  links = links.filter(l=>l);
+  currentStep=4; renderStep();
+};
+
+// STEP 4 - Agreement
+function renderStep4() {
+  document.getElementById('stepContent').innerHTML = `
+    <div class="card">
+      <div class="card-title">✍️ הסכם ייצוג — סטודיו FRAME</div>
+      <div class="terms-box">
+        <h4>הנדון: הסכם יצוג שחקן</h4>
+        <p>סטודיו FRAME שמח לייצג אתכם. על מנת לייצג אתכם נבקש שתקראו את ההסכם במלואו.</p>
+
+        <h4>פרופיל הילד</h4>
+        <p>סטודיו פריים יקיים באתר הבית של הסטודיו "פרופיל שחקן". פרופיל הילד שלכם מורכב ממידע אודות הילד, תמונותיו, כישוריו וכו׳. אנא הקפידו לעדכן את הפרופיל שלו אחת לחודש. ככל שהפרופיל יהיה מעודכן יותר, כך הסיכוי להיבחר על ידי מלהקים גבוה יותר (מלהקים יכולים לחפש ילדים על פי מידת עדכניות הפרופיל שלהם).</p>
+        <p>כמו כן על מנת להגדיל את סיכויי הילד/נער לקבל את התפקיד, עליכם לשתף פעולה ולהגיע לאודישנים.</p>
+        <p>סטודיו FRAME אינה דורשת תשלום על ההרשמה, ואין התחייבות על תקופת הייצוג. אם אתם מעוניינים לעזוב מכל סיבה שהיא עליכם להודיע כחודש מראש באמצעות המייל ותוסרו מהמאגר באופן מיידי. <strong>עם זאת, כל עוד אתם מיוצגים דרכינו אינכם יכולים להיות מיוצגים באף סוכנות אחרת.</strong></p>
+
+        <h4>עדכון פרופיל השחקן</h4>
+        <p>תמונות הן כרטיס הביקור של הילד שלכם. תמונות אלה מוצגות למפיקים/מלהקים ועל פיהן נבחרים הילדים שיזומנו. התמונות צריכות להיות:</p>
+        <ul>
+          <li>תמונות פנים או של פלג הגוף העליון בלבד</li>
+          <li>תמונות ברורות ולא מטושטשות באיכות גבוהה ובצבע (לא שחור לבן)</li>
+          <li>להקפיד שהמיוצג יצולם לבד בתמונה על רקע קיר לבן או רקע נטרלי ולא צבעוני</li>
+          <li>תמונות מגובה העיניים של המצולם, מסתכל למצלמה בהבעות משתנות – חיוך, רציני. ללא פרצופים!</li>
+          <li>ללא אביזרים, כמו משקפי שמש, כובעים וכו׳</li>
+          <li>הילדים צריכים להיות לבושים בבגדי יום יום ולא בעירום</li>
+          <li>שיער טבעי ולא מנופח. רצוי לשלוח תמונות בשיער פזור ואסוף</li>
+          <li>מומלץ להעלות תמונות מקצועיות (בוק שחקן), אך במידה ואין — אנא העלו תמונות באיכות גבוהה</li>
+        </ul>
+        <p>בנוסף לתמונות פנים ניתן לצרף גם תמונות המעידות על ניסיון מהפקות קודמות. כמו כן הקפידו לעדכן אותנו בתמונות בכל פעם שילדכם משתנה או גדל. תמונות שלא יעמדו בקריטריונים (תמונות ערום, רחוקות, מטושטשות, או לא ברורות) לא יאושרו ולא יעלו לאתר.</p>
+
+        <h4>תשלום לילד</h4>
+        <p>כל העבודות שלנו בתשלום לילד! על כל עבודה שהילד/נער יבחר ויצטלם אליה תצטרכו להעביר טופס פטור ממס שנתי התקף לשנה (הסבר להוצאתו תקבלו לאחר ביצוע העבודה הראשונה דרכינו).</p>
+        <p>הסוכנות גובה עמלת חברה (מהחברה המזמינה) ועמלת מיוצג (הילד) בגובה של 20% כל אחת. בכל זימון של ילדכם לאודישן תדעו מהו סכום הנטו אותו יקבל הילד לאחר ניכוי העמלה.</p>
+        <p><strong>חשוב!!!</strong> ברוב ההפקות השכר לילד נע בין 400–800 ₪ נטו (למעט תפקידים ראשיים או גדולים יותר). השכר נקבע על ידי ההפקה והוא אינו ניתן למיקוח. במידה וסכומים אלה אינם תואמים את ציפיותכם, אנא עדכנו אותנו ונסיר את מועמדותכם.</p>
+
+        <h4>זימונים לאודישנים / צילומים</h4>
+        <p>לעולם לא נשלח אתכם לאודישנים מבלי שהמלהקת ראתה ובחרה את המיוצג לפי תמונתכם. לכן אם לא קיבלתם זימון וחבר שלכם קיבל — היו בטוחים שנשלחתם וכנראה להפקה הנוכחית מחפשים משהו אחר. יש תקופות עם יותר אודישנים ויש תקופות עם פחות, אנחנו לא שוכחות אף אחד.</p>
+        <p>הזימונים יימסרו במייל ולעיתים גם בהודעת SMS. יש לאשר הגעה במייל חוזר תמיד. אודישנים לפרסומות נקבעים בד"כ יום קודם וכולם בתל אביב — לכן זמינותכם חשובה.</p>
+        <p>קחו בחשבון שהרשמה לסוכנות לא מחייבת תחילת עבודה מיידית בהפקות, ויכול לעבור זמן מה עד שתקבלו זימון או עבודה ראשונה.</p>
+        <p><strong>שימו לב:</strong> הזימון לאודישן הוא ללא תשלום. התשלום שיופיע בזימון הוא אך ורק לילד שמתקבל (שכר על הצילומים).</p>
+
+        <h4>לאחר קבלה</h4>
+        <p>במידה ותתקבלו להפקה מסוימת תקבלו על כך הודעה במייל/הודעה/טלפון. אנחנו מודיעות רק למי שמתקבל. במידה ואתם רוצים לדעת תשובה לגבי אודישן מסוים שלא קיבלתם תשובה חיובית לגביו, אתם מוזמנים ליצור קשר במייל רק כעבור שבוע מיום האודישן. בסרטים וסדרות התשובות יכולות לקחת גם עד חודשיים.</p>
+
+        <h4>צילומים</h4>
+        <p>ברגע שילדכם נבחר להצטלם, החברה שהזמינה אותו סומכת על ילדכם שיגיע בזמן, נינוח ומוכן לצילומים. אנא דאגו להגיע מוכנים לצילומים, לאחר שהילד ישן טוב, אכל ועם מצב רוח טוב. במידה וקורה אירוע לא צפוי, יש לעדכן במיידי את הסוכנות ואת חברת ההפקה.</p>
+
+        <h4>מסמכי תמ"ת</h4>
+        <p>לפי החוק בישראל אין להעסיק ילד מתחת לגיל 15 ללא היתר מיוחד. אם ילדכם מתחת לגיל 15, עליכם למלא את מסמכי התיווך של התמ"ת המצורפים למייל ולהעלות אותם לאתר כחלק ממילוי שאלון ההרשמה המלא. ללא טפסים אלה לא תוכלו להשלים את הרישום.</p>
+
+        <h4>הצגת ניסיון</h4>
+        <p>בתוך הפרופיל באתר של ילדכם תוכלו לשלוח לנו קישור YouTube עם ניסיון בפרסומות והפקות קודמות. אנו ממליצים לרכז את כל הסרטים תחת קישור אחד של פלייליסט YouTube.</p>
+
+        <h4>אודישן מצולם</h4>
+        <p>מפיקים/מלהקים יכולים לבחור את ילדכם להפקה על בסיס אודישן מצולם בלבד. יש לצלם כאשר הטלפון שוכב לקבלת פריים רוחבי, רואים רק פלג גוף עליון. תאורת אור יום וצבעים טבעיים. לבקש מהילד/ה להגיד שם+גיל ולספר קצת על ניסיון בתחום או על תחביבים. לבסוף חיוך למצלמה. לעדכן כל 3 חודשים.</p>
+
+        <p style="margin-top:14px;font-style:italic;color:var(--text2)">*מייל זה מנוסח בלשון זכר אך פונה לשני המינים<br>בברכה, סטודיו FRAME — יעל ואייל</p>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="chk1">
+        <span style="font-size:14px;line-height:1.5">קראתי את הסכם הייצוג במלואו ואני מסכים/ה לכל תנאיו</span>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="chk2">
+        <span style="font-size:14px;line-height:1.5">אני מאשר/ת כי המידע שמסרתי הוא מדויק ונכון</span>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="chk3">
+        <span style="font-size:14px;line-height:1.5">אני מבין/ה כי כל עוד אני מיוצג/ת דרך סטודיו FRAME אינני יכול/ה להיות מיוצג/ת בסוכנות אחרת</span>
+      </label>
+
+      <div class="field" style="margin-top:14px">
+        <label>חתימה דיגיטלית — הקלד/י את שמך המלא <span class="required">*</span></label>
+        <input id="sig" placeholder="שם מלא — מהווה חתימה דיגיטלית מחייבת">
+        <div class="hint">הקלדת שמך מהווה חתימה דיגיטלית מחייבת על הסכם זה</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" onclick="goBack()" style="flex:0.4">← חזור</button>
+      <button class="btn btn-gold" id="submitBtn" onclick="submitForm()" style="flex:1">📤 שלח הרשמה</button>
+    </div>`;
+}
+
+window.goBack = () => { currentStep--; renderStep(); };
+
+// SUBMIT
+window.submitForm = async () => {
+  if (!document.getElementById('chk1').checked || !document.getElementById('chk2').checked || !document.getElementById('chk3').checked) {
+    alert('יש לאשר את כל תנאי ההסכם'); return;
+  }
+  const sig = document.getElementById('sig').value.trim();
+  if (!sig) { alert('יש לחתום עם שמך המלא'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+
+  try {
+    // Upload photos
+    const photoURLs = [];
+    for (let i = 0; i < 3; i++) {
+      if (photoFiles[i]) {
+        btn.textContent = `⏳ מעלה תמונה ${i+1}/3...`;
+        const fd = new FormData();
+        fd.append('file', photoFiles[i]);
+        fd.append('upload_preset', 'frame_unsigned');
+        const res = await fetch('https://api.cloudinary.com/v1_1/dl9lqwvyr/image/upload', { method:'POST', body:fd });
+        const data = await res.json();
+        if (data?.secure_url) photoURLs.push(data.secure_url);
+      }
+    }
+
+    btn.textContent = '⏳ שומר...';
+    const regData = {
+      ...window._fd,
+      links: links.filter(l=>l),
+      photos: photoURLs,
+      signature: sig,
+      agreementDate: new Date().toISOString(),
+      email: currentUser.email,
+      uid: currentUser.uid,
+      status: 'pending',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+    await setDoc(doc(db, 'registrations', currentUser.uid), regData);
+    userData = regData;
+    showStatusWaiting();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '📤 שלח הרשמה';
+    alert('שגיאה: ' + e.message);
+  }
+};
+
+// ===== STATUS WAITING =====
+function showStatusWaiting() {
+  const s = document.getElementById('appScreen');
+  const status = userData?.status || 'pending';
+  s.innerHTML = `
+    <header><div class="logo">F R A M E</div><div class="logo-sub">פורטל מיוצגים</div></header>
+    <div class="page" style="text-align:center;padding-top:40px">
+      <div style="font-size:64px;margin-bottom:16px">${status==='pending'?'🎬':status==='approved'?'🌟':'😔'}</div>
+      <div style="font-size:22px;font-weight:900;color:var(--gold);margin-bottom:10px">
+        ${status==='pending'?'ההרשמה התקבלה!':status==='approved'?'ברוך הבא לסטודיו!':'הבקשה לא אושרה'}
+      </div>
+      <div style="margin:14px 0">
+        <span class="status-badge status-${status}">
+          ${status==='pending'?'⏳ ממתין לאישור':status==='approved'?'✅ מאושר':'❌ לא אושר'}
+        </span>
+      </div>
+      <div style="color:var(--text2);font-size:15px;line-height:1.7;max-width:320px;margin:0 auto">
+        ${status==='pending'?`שלום <strong style="color:var(--text)">${userData?.firstName||''}</strong>,<br>הטופס שלך התקבל ומחכה לאישור יעל ואייל.<br>נחזור אליך בהקדם!`:''}
+        ${status==='rejected'?`לצערנו הבקשה לא אושרה הפעם.<br>לפרטים נוספים פנה למייל הסוכנות.`:''}
+      </div>
+      <button class="btn btn-ghost" onclick="doSignOut()" style="margin-top:28px;width:auto;padding:10px 24px">יציאה</button>
+    </div>`;
+}
+
+// ===== PROFILE PAGE (after approval) =====
+async function showProfile() {
+  const snap = await getDoc(doc(db, 'registrations', currentUser.uid));
+  userData = snap.exists() ? snap.data() : userData;
+  let myAuditions = [];
+  try {
+    const q = query(collection(db, 'auditions_public'), where('clientUid', '==', currentUser.uid));
+    const aSnap = await getDocs(q);
+    aSnap.forEach(d => { if (!d.data().deleted) myAuditions.push({ id: d.id, ...d.data() }); });
+    myAuditions.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  } catch(e) {}
+  // Load unread notifications
+  let notifs = [];
+  try {
+    const nq = query(collection(db, 'notifications'), where('uid','==',currentUser.uid));
+    const nSnap = await getDocs(nq);
+    nSnap.forEach(d => notifs.push({ id: d.id, ...d.data() }));
+    notifs.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+  } catch(e) {}
+  window._myNotifs = notifs;
+  renderProfilePage(myAuditions);
+}
+
+function renderProfilePage(auditions) {
+  const d = userData || {};
+  const s = document.getElementById('appScreen');
+  const unreadCount = (window._myNotifs||[]).filter(n=>!n.read).length;
+  const tabs = [
+    { id:'profile', label:'👤 פרופיל' },
+    { id:'auditions', label:'📣 אודישנים' + (auditions.length > 0 ? ` (${auditions.length})` : '') },
+    { id:'notifications', label:'🔔 התראות' + (unreadCount > 0 ? ` <span style="background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:11px">${unreadCount}</span>` : '') },
+    { id:'agreement', label:'📋 הסכם' },
+  ];
+  s.innerHTML = `
+    <header style="text-align:center;padding:18px 16px 14px;border-bottom:1px solid var(--border);background:var(--dark2)">
+      <div class="logo">F R A M E</div>
+      <div style="font-size:18px;font-weight:900;margin-top:8px">${d.firstName||''} ${d.lastName||''}</div>
+      <div style="margin-top:4px"><span class="status-badge status-approved" style="font-size:12px">✅ מיוצג פעיל</span></div>
+    </header>
+    <div style="overflow-x:auto;background:var(--dark2);border-bottom:1px solid var(--border)">
+      <div style="display:flex;min-width:max-content;padding:0 8px">
+        ${tabs.map(t=>`<button class="profile-tab ${activeProfileTab===t.id?'active':''}" onclick="switchProfileTab('${t.id}')" style="white-space:nowrap">${t.label}</button>`).join('')}
+      </div>
+    </div>
+    <div class="page" style="padding-top:18px"><div id="profileContent"></div></div>`;
+
+  renderProfileTab(auditions);
+}
+
+window._auditionsCache = [];
+window.switchProfileTab = async (tab) => {
+  activeProfileTab = tab;
+  document.querySelectorAll('.profile-tab').forEach(btn => {
+    const id = btn.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+    btn.classList.toggle('active', id === tab);
+  });
+  // Mark notifications as read when opening tab
+  if (tab === 'notifications') {
+    const unread = (window._myNotifs||[]).filter(n=>!n.read);
+    for (const n of unread) {
+      try { await updateDoc(doc(db,'notifications',n.id),{read:true}); n.read=true; } catch(e){}
+    }
+    // Re-render header without badge
+    const d = userData||{};
+    document.querySelectorAll('.profile-tab').forEach(btn=>{
+      if(btn.textContent.includes('התראות')) btn.innerHTML = '🔔 התראות';
+    });
+  }
+  renderProfileTab(window._auditionsCache);
+};
+
+function renderProfileTab(auditions) {
+  window._auditionsCache = auditions;
+  const d = userData || {};
+  const container = document.getElementById('profileContent');
+
+  if (activeProfileTab === 'notifications') {
+    const notifs = window._myNotifs || [];
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-title">🔔 התראות מהסוכנות</div>
+        ${notifs.length === 0
+          ? '<div style="text-align:center;color:var(--text2);padding:30px">אין התראות עדיין</div>'
+          : notifs.map(n => {
+              const timeStr = n.createdAt?.seconds
+                ? new Date(n.createdAt.seconds*1000).toLocaleDateString('he-IL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+                : '';
+              return `<div style="display:flex;gap:12px;align-items:flex-start;padding:14px;background:${n.read?'var(--dark4)':'rgba(245,200,66,0.06)'};border:1px solid ${n.read?'rgba(255,255,255,0.06)':'rgba(245,200,66,0.2)'};border-radius:12px;margin-bottom:8px">
+                <div style="font-size:24px;flex-shrink:0">${n.title?.charAt(0)||'🔔'}</div>
+                <div style="flex:1">
+                  <div style="font-weight:700;font-size:15px;margin-bottom:3px">${n.title||''}</div>
+                  <div style="font-size:13px;color:var(--text2)">${n.body||''}</div>
+                  ${timeStr?`<div style="font-size:11px;color:var(--text2);margin-top:4px">${timeStr}</div>`:''}
+                </div>
+                ${!n.read?'<div style="width:8px;height:8px;background:var(--gold);border-radius:50%;flex-shrink:0;margin-top:4px"></div>':''}
+              </div>`;
+            }).join('')}
+      </div>`;
+    return;
+  }
+
+  if (activeProfileTab === 'agreement') {
+    const sigDate = d.agreementDate ? new Date(d.agreementDate).toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'}) : '';
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-title">📋 הסכם הייצוג שלי</div>
+        <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.25);border-radius:10px;padding:10px 16px;font-size:13px">
+            <div style="color:var(--green);font-weight:700">✅ הסכם חתום</div>
+            ${sigDate?`<div style="color:var(--text2);margin-top:2px">${sigDate}</div>`:''}
+          </div>
+          <div style="background:var(--dark4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 16px;font-size:13px">
+            <div style="color:var(--gold);font-weight:700">✍️ חתימה דיגיטלית</div>
+            <div style="color:var(--text2);margin-top:2px">${d.signature||'—'}</div>
+          </div>
+        </div>
+        <div class="terms-box" style="max-height:500px">
+          <h4>הנדון: הסכם יצוג שחקן</h4>
+          <p>סטודיו FRAME שמח לייצג אתכם. על מנת לייצג אתכם נבקש שתקראו את ההסכם במלואו.</p>
+
+          <h4>פרופיל הילד</h4>
+          <p>סטודיו פריים יקיים באתר הבית של הסטודיו "פרופיל שחקן". פרופיל הילד שלכם מורכב ממידע אודות הילד, תמונותיו, כישוריו וכו׳. אנא הקפידו לעדכן את הפרופיל שלו אחת לחודש. ככל שהפרופיל יהיה מעודכן יותר, כך הסיכוי להיבחר על ידי מלהקים גבוה יותר (מלהקים יכולים לחפש ילדים על פי מידת עדכניות הפרופיל שלהם).</p>
+          <p>כמו כן על מנת להגדיל את סיכויי הילד/נער לקבל את התפקיד, עליכם לשתף פעולה ולהגיע לאודישנים.</p>
+          <p>סטודיו FRAME אינה דורשת תשלום על ההרשמה, ואין התחייבות על תקופת הייצוג. אם אתם מעוניינים לעזוב מכל סיבה שהיא עליכם להודיע כחודש מראש באמצעות המייל ותוסרו מהמאגר באופן מיידי. <strong>עם זאת, כל עוד אתם מיוצגים דרכינו אינכם יכולים להיות מיוצגים באף סוכנות אחרת.</strong></p>
+
+          <h4>עדכון פרופיל השחקן</h4>
+          <p>תמונות הן כרטיס הביקור של הילד שלכם. תמונות אלה מוצגות למפיקים/מלהקים ועל פיהן נבחרים הילדים שיזומנו.</p>
+          <p>התמונות צריכות להיות:</p>
+          <ul>
+            <li>תמונות פנים או של פלג הגוף העליון בלבד</li>
+            <li>תמונות ברורות ולא מטושטשות באיכות גבוהה ובצבע (לא שחור לבן)</li>
+            <li>המיוצג יצולם לבד בתמונה על רקע קיר לבן או רקע נטרלי ולא צבעוני</li>
+            <li>תמונות מגובה העיניים של המצולם, מסתכל למצלמה בהבעות משתנות – חיוך, רציני. ללא פרצופים!</li>
+            <li>ללא אביזרים, כמו משקפי שמש, כובעים וכו׳</li>
+            <li>הילדים צריכים להיות לבושים בבגדי יום יום ולא בעירום</li>
+            <li>שיער טבעי ולא מנופח. רצוי לשלוח תמונות בשיער פזור ואסוף</li>
+            <li>מומלץ להעלות תמונות מקצועיות (בוק שחקן), אך במידה ואין — אנא העלו תמונות באיכות גבוהה</li>
+          </ul>
+          <p>בנוסף לתמונות פנים ניתן לצרף גם תמונות המעידות על ניסיון מהפקות קודמות. הקפידו לעדכן אותנו בתמונות בכל פעם שילדכם משתנה או גדל. תמונות שלא יעמדו בקריטריונים לא יאושרו ולא יעלו לאתר.</p>
+
+          <h4>תשלום לילד</h4>
+          <p>כל העבודות שלנו בתשלום לילד! על כל עבודה שהילד/נער יבחר ויצטלם אליה תצטרכו להעביר טופס פטור ממס שנתי התקף לשנה.</p>
+          <p>הסוכנות גובה עמלת חברה (מהחברה המזמינה) ועמלת מיוצג (הילד) בגובה של 20% כל אחת. בכל זימון לאודישן תדעו מהו סכום הנטו אותו יקבל הילד לאחר ניכוי העמלה.</p>
+          <p><strong>חשוב!</strong> ברוב ההפקות השכר לילד נע בין 400–800 ₪ נטו (למעט תפקידים ראשיים). השכר נקבע על ידי ההפקה והוא אינו ניתן למיקוח.</p>
+
+          <h4>זימונים לאודישנים / צילומים</h4>
+          <p>לעולם לא נשלח אתכם לאודישנים מבלי שהמלהקת ראתה ובחרה את המיוצג לפי תמונתכם. הזימונים יימסרו במייל ולעיתים גם בהודעת SMS. יש לאשר הגעה במייל חוזר תמיד. אודישנים לפרסומות נקבעים בד"כ יום קודם וכולם בתל אביב — לכן זמינותכם חשובה.</p>
+          <p>קחו בחשבון שהרשמה לסוכנות לא מחייבת תחילת עבודה מיידית, ויכול לעבור זמן מה עד שתקבלו זימון ראשון.</p>
+
+          <h4>לאחר קבלה</h4>
+          <p>במידה ותתקבלו להפקה מסוימת תקבלו על כך הודעה במייל/הודעה/טלפון. אנחנו מודיעות רק למי שמתקבל. במידה ואתם רוצים לדעת תשובה לגבי אודישן שלא קיבלתם תשובה חיובית לגביו — ניתן לפנות במייל כעבור שבוע מיום האודישן.</p>
+
+          <h4>צילומים</h4>
+          <p>ברגע שילדכם נבחר להצטלם, החברה סומכת על ילדכם שיגיע בזמן, נינוח ומוכן. במידה וקורה אירוע לא צפוי יש לעדכן במיידי את הסוכנות ואת חברת ההפקה.</p>
+
+          <h4>מסמכי תמ"ת</h4>
+          <p>לפי החוק בישראל אין להעסיק ילד מתחת לגיל 15 ללא היתר מיוחד. אם ילדכם מתחת לגיל 15, עליכם למלא את מסמכי התיווך של התמ"ת. ללא טפסים אלה לא תוכלו להשלים את הרישום.</p>
+
+          <h4>הצגת ניסיון</h4>
+          <p>בתוך הפרופיל תוכלו לשלוח לנו קישור YouTube עם ניסיון בפרסומות והפקות קודמות. אנו ממליצים לרכז את כל הסרטים תחת קישור אחד של פלייליסט YouTube.</p>
+
+          <h4>אודישן מצולם</h4>
+          <p>מפיקים/מלהקים יכולים לבחר את ילדכם על בסיס אודישן מצולם בלבד. יש לצלם בפריים רוחבי, פלג גוף עליון, תאורת אור יום. הילד/ה יגיד שם+גיל ויספר על ניסיון או תחביבים. לעדכן כל 3 חודשים.</p>
+
+          <p style="margin-top:16px;font-style:italic;color:var(--text2)">*מייל זה מנוסח בלשון זכר אך פונה לשני המינים<br>בברכה, סטודיו FRAME — יעל ואייל</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (activeProfileTab === 'profile') {
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-title">👤 פרטים אישיים</div>
+        <div class="section-label">פרטי המיוצג</div>
+        <div class="grid2">
+          <div class="field"><label>שם פרטי</label><input id="e1" value="${d.firstName||''}"></div>
+          <div class="field"><label>שם משפחה</label><input id="e2" value="${d.lastName||''}"></div>
+          <div class="field"><label>תאריך לידה</label><input type="date" id="e3" value="${d.birthday||''}"></div>
+          <div class="field"><label>ת.ז</label><input id="e4" value="${d.idNumber||''}"></div>
+          <div class="field"><label>טלפון</label><input type="tel" id="e5" value="${d.phone||''}"></div>
+          <div class="field"><label>מייל</label><input type="email" id="e6" value="${d.email||''}"></div>
+        </div>
+        <div class="section-label">פרטי הורה</div>
+        <div class="grid2">
+          <div class="field"><label>שם הורה</label><input id="e7" value="${d.parentName||''}"></div>
+          <div class="field"><label>טלפון הורה</label><input type="tel" id="e8" value="${d.parentPhone||''}"></div>
+          <div class="field"><label>מייל הורה</label><input type="email" id="e9" value="${d.parentEmail||''}"></div>
+        </div>
+        <div class="field">
+          <label>ניסיון / כישורים</label>
+          <textarea id="e10">${d.notes||''}</textarea>
+        </div>
+        <button class="btn btn-gold" style="margin-top:6px" onclick="saveProfile()">💾 שמור שינויים</button>
+      </div>
+      <button class="btn btn-ghost" onclick="doSignOut()" style="width:auto;padding:10px 24px">יציאה</button>`;
+
+  } else if (activeProfileTab === 'photos') {
+    const photos = d.photos || [];
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-title">📸 תמונות הפרופיל</div>
+        <p class="hint" style="margin-bottom:14px">עד 3 תמונות — פנים / פלג גוף עליון, רקע נייטרלי, איכות גבוהה</p>
+        <div class="photos-grid" id="photoGrid">
+          ${[0,1,2].map(i => {
+            const url = photos[i] || '';
+            return `<div class="photo-slot ${url?'has-image':''}" id="pslot${i}" onclick="document.getElementById('pf${i}').click()">
+              <input type="file" id="pf${i}" accept="image/*" onchange="handleProfilePhoto(${i},this)">
+              ${url ? `<img src="${url}" id="pimg${i}"><button class="remove-photo" onclick="event.stopPropagation();removeProfilePhoto(${i})">✕</button>` : `<div style="font-size:26px;margin-bottom:6px">📷</div><div style="font-size:12px;color:var(--text2)">תמונה ${i+1}</div>`}
+            </div>`;
+          }).join('')}
+        </div>
+        <div id="photoSaveMsg" style="margin-top:12px;display:none;color:var(--green);font-size:13px;text-align:center">✅ התמונות עודכנו!</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔗 קישורים לעבודות</div>
+        <div id="linksEdit">
+          ${(d.links||['']).map((l,i)=>`
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <input type="url" value="${l}" placeholder="https://youtube.com/..." style="direction:ltr;text-align:left" id="lnk${i}">
+            </div>`).join('')}
+        </div>
+        <button style="background:rgba(245,200,66,0.1);border:1px dashed rgba(245,200,66,0.3);border-radius:10px;padding:10px;color:var(--gold);font-size:13px;cursor:pointer;width:100%;font-family:Heebo,sans-serif;font-weight:600;margin-bottom:10px" onclick="addProfileLink()">+ הוסף קישור</button>
+        <button class="btn btn-gold" onclick="saveLinks()">💾 שמור קישורים</button>
+      </div>`;
+
+    // Store profile photo state
+    window._profilePhotos = [...(d.photos||[null,null,null])];
+
+  } else if (activeProfileTab === 'auditions') {
+    const statusMap = {
+      sent: { label:'📤 נשלח', cls:'as-sent', desc:'האודישן נשלח לסוכנות' },
+      waiting: { label:'⏳ ממתין לתשובה', cls:'as-waiting', desc:'ממתינים לתשובה מהמלהקת' },
+      callback: { label:'🔄 קולבק!', cls:'as-callback', desc:'התקדמת לשלב הבא!' },
+      got_role: { label:'🌟 קיבלת תפקיד!', cls:'as-got_role', desc:'מזל טוב!' },
+      rejected: { label:'❌ לא התקבלת', cls:'as-rejected', desc:'הפעם לא, בפעם הבאה!' },
+    };
+    const waiting = auditions.filter(a=>a.status==='waiting'||a.status==='callback');
+    container.innerHTML = `
+      ${waiting.length>0?`<div class="card" style="border-color:rgba(245,200,66,0.3);background:rgba(245,200,66,0.04)">
+        <div class="card-title" style="color:var(--gold)">⏳ ממתינים לתשובה (${waiting.length})</div>
+        ${waiting.map(a=>`<div class="audit-item" style="border-color:rgba(245,200,66,0.2)">
+          <div class="audit-project">${a.project||'אודישן'}</div>
+          <div class="audit-meta">${a.date?'📅 '+a.date.split('-').reverse().join('.'):''}${a.role?' · 🎭 '+a.role:''}</div>
+          <span class="audit-status ${statusMap[a.status]?.cls||'as-waiting'}">${statusMap[a.status]?.label||''}</span>
+        </div>`).join('')}
+      </div>`:''}
+      <div class="card">
+        <div class="card-title">📋 כל האודישנים שלי</div>
+        ${auditions.length === 0
+          ? '<div style="text-align:center;color:var(--text2);padding:30px">⏳ עדיין לא נשלחו אודישנים<br><span style="font-size:13px">ברגע שהסוכנות תשלח אותך לאודישן זה יופיע כאן</span></div>'
+          : auditions.map(a => {
+              const st = statusMap[a.status] || statusMap.sent;
+              return `<div class="audit-item">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+                  <div class="audit-project">${a.project||'אודישן'}</div>
+                  <span class="audit-status ${st.cls}" style="white-space:nowrap;flex-shrink:0">${st.label}</span>
+                </div>
+                <div class="audit-meta">
+                  ${a.date ? '📅 ' + a.date.split('-').reverse().join('.') : ''}
+                  ${a.role ? ' · 🎭 ' + a.role : ''}
+                  ${a.casting ? ' · 🎬 ' + a.casting : ''}
+                </div>
+                ${a.notes ? `<div style="font-size:12px;color:var(--text2);margin-top:4px">${a.notes}</div>` : ''}
+              </div>`;
+            }).join('')}
+      </div>`;
+  }
+}
+
+window.saveProfile = async () => {
+  const v = (id) => document.getElementById(id)?.value.trim()||'';
+  const updates = {
+    firstName:v('e1'), lastName:v('e2'), birthday:v('e3'), idNumber:v('e4'),
+    phone:v('e5'), email:v('e6'), parentName:v('e7'), parentPhone:v('e8'),
+    parentEmail:v('e9'), notes:v('e10'), updatedAt: serverTimestamp()
+  };
+  try {
+    await updateDoc(doc(db, 'registrations', currentUser.uid), updates);
+    Object.assign(userData, updates);
+    alert('✅ הפרטים עודכנו!');
+  } catch(e) { alert('שגיאה: '+e.message); }
+};
+
+window.handleProfilePhoto = async (i, inp) => {
+  if (!inp.files[0]) return;
+  const slot = document.getElementById('pslot'+i);
+  slot.style.opacity = '0.5';
+  try {
+    const fd = new FormData();
+    fd.append('file', inp.files[0]);
+    fd.append('upload_preset', 'frame_unsigned');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dl9lqwvyr/image/upload', { method:'POST', body:fd });
+    const data = await res.json();
+    if (data?.secure_url) {
+      const url = data.secure_url;
+      window._profilePhotos[i] = url;
+      // Update in Firebase
+      await updateDoc(doc(db, 'registrations', currentUser.uid), { photos: window._profilePhotos, updatedAt: serverTimestamp() });
+      userData.photos = [...window._profilePhotos];
+      slot.innerHTML = `<input type="file" id="pf${i}" accept="image/*" onchange="handleProfilePhoto(${i},this)"><img src="${url}" id="pimg${i}"><button class="remove-photo" onclick="event.stopPropagation();removeProfilePhoto(${i})">✕</button>`;
+      slot.classList.add('has-image');
+      document.getElementById('photoSaveMsg').style.display = 'block';
+    }
+  } catch(e) { alert('שגיאה בהעלאת תמונה'); }
+  slot.style.opacity = '1';
+};
+
+window.removeProfilePhoto = async (i) => {
+  window._profilePhotos[i] = null;
+  try {
+    await updateDoc(doc(db, 'registrations', currentUser.uid), { photos: window._profilePhotos, updatedAt: serverTimestamp() });
+    userData.photos = [...window._profilePhotos];
+  } catch(e) {}
+  activeProfileTab = 'photos';
+  renderProfilePage(window._auditionsCache);
+};
+
+window.addProfileLink = () => {
+  const wrap = document.getElementById('linksEdit');
+  const i = wrap.children.length;
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px';
+  div.innerHTML = `<input type="url" placeholder="https://youtube.com/..." style="direction:ltr;text-align:left;background:var(--dark4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;color:var(--text);font-family:Heebo,sans-serif;font-size:15px;width:100%;outline:none" id="lnk${i}">`;
+  wrap.appendChild(div);
+};
+
+window.saveLinks = async () => {
+  const inputs = document.querySelectorAll('#linksEdit input');
+  const newLinks = [...inputs].map(inp=>inp.value.trim()).filter(l=>l);
+  try {
+    await updateDoc(doc(db, 'registrations', currentUser.uid), { links: newLinks, updatedAt: serverTimestamp() });
+    userData.links = newLinks;
+    alert('✅ הקישורים עודכנו!');
+  } catch(e) { alert('שגיאה: '+e.message); }
+};
+
+window.doSignOut = async () => {
+  await signOut(auth);
+  userData = null;
+  window._fd = {};
+  photoFiles = [null,null,null];
+  links = [''];
+  currentStep = 1;
+};
+
+</script>
+</body>
+</html>
